@@ -29,31 +29,6 @@ spec:
             // }
             defaultContainer 'shell'
         }
-    kubernetes {
-      label 'kaniko'
-      yaml """
-kind: Pod
-metadata:
-  name: kaniko
-spec:
-  containers:
-  - name: builder
-    image: gcr.io/kaniko-project/executor:debug
-    imagePullPolicy: Always
-    command:
-    - /busybox/cat
-    tty: true
-    volumeMounts:
-      - name: kaniko-secret
-        mountPath: /kaniko/.docker
-  volumes:
-  - name: kaniko-secret
-    secret:
-      secretName: kaniko-secret
-      optional: false
-"""
-        }
-    }
     stages {
         //1
         stage('Prepare environment') {
@@ -143,7 +118,31 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
         //8
         stage('Build & Push') {
             agent { 
-                label 'kaniko'
+                kubernetes {
+                    label 'kaniko'
+                    yaml """
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+  - name: builder
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: Always
+    command:
+    - /busybox/cat
+    tty: true
+    volumeMounts:
+      - name: kaniko-secret
+        mountPath: /kaniko/.docker
+  volumes:
+  - name: kaniko-secret
+    secret:
+      secretName: kaniko-secret
+      optional: false
+"""
+                    }
+                }
             }
             steps {
             echo '''08# Stage - Build & Push
