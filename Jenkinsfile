@@ -54,7 +54,6 @@ spec:
 """
         }
     }
-    agent none
     stages {
         //1
         stage('Prepare environment') {
