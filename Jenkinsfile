@@ -52,6 +52,6 @@ De esta forma, todos los artefactos generados en la rama master, no tendrán el 
             steps {
                 sh 'mvn clean compile'
             }
-
+        }
     }
 }
