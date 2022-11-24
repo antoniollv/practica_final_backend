@@ -135,4 +135,3 @@ Que elimine siempre los recursos creados en la stage 8.
         }
     }
 }
-}
