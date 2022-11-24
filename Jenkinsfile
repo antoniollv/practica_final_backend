@@ -33,9 +33,6 @@ spec:
     stages {
         //1
         stage('Prepare environment') {
-            agent { 
-                label 'default'
-            }
             steps {
                 echo '''01# Stage - Prepare environment
 '''
@@ -47,9 +44,6 @@ spec:
         }
         //2
         stage('Code promotion') {
-            agent { 
-                label 'default'
-            }
             when { branch "main" }
             steps {
             echo '''02# Stage - Code promotion
@@ -62,9 +56,6 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
         }
         //3
         stage('Compile') {
-            agent { 
-                label 'default'
-            }
             steps {
                 echo '''03# Stage - Compile
 '''
@@ -84,9 +75,6 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
         }
         //5
         stage('JaCoCo Tests') {
-            agent { 
-                label 'default'
-            }
             steps {
             echo '''05# Stage - JaCoCo Tests
 (develop y main): Lanzamiento de las pruebas con JaCoCo'
@@ -95,9 +83,6 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
         }
         //6
         stage('Quality Tests') {
-            agent { 
-                label 'default'
-            }
             steps {
             echo '''06# Stage - Quality Tests
             (develop y main): Comprobación de la calidad del código con Sonarqube.
@@ -106,9 +91,6 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
         }
         //7
         stage('Package') {
-            agent { 
-                label 'default'
-            }
             steps {
             echo '''07# Stage - Package
 (develop y main): Generación del artefacto .jar (SNAPSHOT)
@@ -142,7 +124,6 @@ spec:
       secretName: kaniko-secret
       optional: false
 """
-                    }
                 }
             }
             steps {
@@ -156,9 +137,6 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
         }
         //9
         stage('Run test environment') {
-            agent { 
-                label 'default'
-            }
             steps {
             echo '''09# Stage - Run test environment
 (develop y main): Iniciar un pod o contenedor con la imagen que acabamos de generar.
@@ -167,11 +145,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
         }
         //10
         stage('API Test o Performance TestPackage') {
-            agent { 
-                label 'default'
-            }
             steps {
-            
             echo '''10# Stage - API Test o Performance TestPackage
 (develop y main): Lanzar los test de JMeter o las pruebas de API con Newman.
 '''
@@ -179,9 +153,6 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
         }
         //11
         stage('Nexus') {
-            agent { 
-                label 'default'
-            }
             steps {
             echo '''11# Stage - Nexus
 (develop y main): Si se ha llegado a esta etapa sin problemas:
@@ -192,9 +163,6 @@ Generación del artefacto .jar (SNAPSHOT)
         }
         //12
         stage('Deploy') {
-            agent { 
-                label 'default'
-            }
             when { branch "main" }
             steps {
             echo '''12# Stage - Deploy
@@ -207,12 +175,10 @@ Para ello se deberá generar un Chart de Helm como los vistos en clase que conte
     }
     //13
     post { 
-        always { 
-            agent { 
-                label 'default'
-            }
+        always {            
             echo '''No es una stage como tal sino un bloque post:
 Que elimine siempre los recursos creados en la stage 8.
 '''
         }
     }
+}
