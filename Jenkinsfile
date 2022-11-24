@@ -33,6 +33,8 @@ spec:
         //1
         stage('Prepare environment') {
             steps {
+                echo '''01# Stage - Prepare environment
+'''
                 echo "Running ${env.BUILD_ID} proyecto ${env.JOB_NAME} rama ${env.BRANCH_NAME}"
                 sh 'echo "Versión Java instalada en el agente: $(java -version)"'
                 sh 'echo "Versión Maven instalada en el agente: $(mvn --version)"'
@@ -43,7 +45,8 @@ spec:
         stage('Code promotion') {
             when { branch "main" }
             steps {
-            echo '''En esta etapa se debe comprobar que la versión indicada en el fichero pom.xml no contiene el sufijo -SNAPSHOT.
+            echo '''02# Stage - Code promotion
+En esta etapa se debe comprobar que la versión indicada en el fichero pom.xml no contiene el sufijo -SNAPSHOT.
 De ser así, se debe modificar el fichero pom.xml, eliminando el sufijo.
 Una vez hecho esto, se debe hacer commit del cambio y push a la rama main.
 De esta forma, todos los artefactos generados en la rama main, no tendrán el sufijo SNAPSHOT.
@@ -53,63 +56,78 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
         //3
         stage('Compile') {
             steps {
+                echo '''03# Stage - Compile
+'''
                 sh 'mvn clean compile'
             }
         }
         //4
         stage('Unit Tests') {
             steps {
-            echo '''(develop y main): Lanzamiento de test unitarios.
+            echo '''04# Stage - Unit Tests
+(develop y main): Lanzamiento de test unitarios.
 '''
             }
         }
         //5
         stage('JaCoCo Tests') {
             steps {
-            echo '''(develop y main): Lanzamiento de las pruebas con JaCoCo'
+            echo '''05# Stage - JaCoCo Tests
+(develop y main): Lanzamiento de las pruebas con JaCoCo'
 '''
             }
         }
         //6
         stage('Quality Tests') {
             steps {
-            echo '''(develop y main): Comprobación de la calidad del código con Sonarqube.
+            echo '''06# Stage - Quality Tests
+            (develop y main): Comprobación de la calidad del código con Sonarqube.
 '''
             }
         }
         //7
         stage('Package') {
             steps {
-            echo '''(develop y main): Generación del artefacto .jar (SNAPSHOT)
+            echo '''07# Stage - Package
+(develop y main): Generación del artefacto .jar (SNAPSHOT)
 '''
+                sh 'mvn package'
             }
         }
         //8
         stage('Build & Push') {
+            container('kaniko') {    
             steps {
-            echo '''(develop y main): Construcción de la imagen con Kaniko y subida de la misma a vuestro repositorio personal en Docker Hub.
-Ppara el etiquetado de la imagen se utilizará la versión del pom.xml
+            echo '''08# Stage - Build & Push
+(develop y main): Construcción de la imagen con Kaniko y subida de la misma a vuestro repositorio personal en Docker Hub.
+Para el etiquetado de la imagen se utilizará la versión del pom.xml
 '''
+                sh '/kaniko/executor --dockerfile $(pwd)/Dockerfile --context $(pwd) \
+                --destinatión=alledodev/app-pf-backend:1.0'
+            }
             }
         }
         //9
         stage('Run test environment') {
             steps {
-            echo '''(develop y main): Iniciar un pod o contenedor con la imagen que acabamos de generar.
+            echo '''09# Stage - Run test environment
+(develop y main): Iniciar un pod o contenedor con la imagen que acabamos de generar.
 '''
             }
         }
         //10
         stage('API Test o Performance TestPackage') {
             steps {
-            echo '''(develop y main): Lanzar los test de JMeter o las pruebas de API con Newman.
+            echo '''10# Stage - API Test o Performance TestPackage
+(develop y main): Lanzar los test de JMeter o las pruebas de API con Newman.
 '''
             }
         }
         //11
         stage('Nexus') {
             steps {
-            echo '''(develop y main): Si se ha llegado a esta etapa sin problemas:
+            echo '''11# Stage - Nexus
+(develop y main): Si se ha llegado a esta etapa sin problemas:
 Se deberá depositar el artefacto generado (.jar) en Nexus.(develop y main)
 Generación del artefacto .jar (SNAPSHOT)
 '''
@@ -119,7 +137,8 @@ Generación del artefacto .jar (SNAPSHOT)
         stage('Deploy') {
             when { branch "main" }
             steps {
-            echo '''(main): En esta stage se debe desplegar en un pod.
+            echo '''12# Stage - Deploy
+(main): En esta stage se debe desplegar en un pod.
 La imagen generada en la etapa 8.
 Para ello se deberá generar un Chart de Helm como los vistos en clase que contenga un ConfigMap y un Pod con dicha imagen (stage opcional)
 '''
