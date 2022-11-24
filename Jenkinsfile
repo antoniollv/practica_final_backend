@@ -29,6 +29,32 @@ spec:
             defaultContainer 'shell'
         }
     }
+    agent {
+    kubernetes {
+      label 'kaniko'
+      yaml """
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+  - name: builder
+    image: gcr.io/kaniko-project/executor:debug
+    imagePullPolicy: Always
+    command:
+    - /busybox/cat
+    tty: true
+    volumeMounts:
+      - name: kaniko-secret
+        mountPath: /kaniko/.docker
+  volumes:
+  - name: kaniko-secret
+    secret:
+      secretName: kaniko-secret
+      optional: false
+"""
+        }
+    }
     stages {
         //1
         stage('Prepare environment') {
@@ -96,15 +122,16 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
         }
         //8
         stage('Build & Push') {
+            agent { 
+                label 'kaniko'
+            }
             steps {
-            container('kaniko') {
             echo '''08# Stage - Build & Push
 (develop y main): Construcción de la imagen con Kaniko y subida de la misma a vuestro repositorio personal en Docker Hub.
 Para el etiquetado de la imagen se utilizará la versión del pom.xml
 '''
                 sh '/kaniko/executor --dockerfile $(pwd)/Dockerfile --context $(pwd) \
                 --destinatión=alledodev/app-pf-backend:1.0'
-            }
             }
         }
         //9
