@@ -29,6 +29,7 @@ spec:
             // }
             defaultContainer 'shell'
         }
+    }
     stages {
         //1
         stage('Prepare environment') {
