@@ -41,12 +41,12 @@ spec:
         }
         //2
         stage('Code promotion') {
-            when { branch "master" }
+            when { branch "main" }
             steps {
             echo '''En esta etapa se debe comprobar que la versión indicada en el fichero pom.xml no contiene el sufijo -SNAPSHOT.
 De ser así, se debe modificar el fichero pom.xml, eliminando el sufijo.
-Una vez hecho esto, se debe hacer commit del cambio y push a la rama master.
-De esta forma, todos los artefactos generados en la rama master, no tendrán el sufijo SNAPSHOT.
+Una vez hecho esto, se debe hacer commit del cambio y push a la rama main.
+De esta forma, todos los artefactos generados en la rama main, no tendrán el sufijo SNAPSHOT.
 '''
             }
         }
@@ -59,35 +59,35 @@ De esta forma, todos los artefactos generados en la rama master, no tendrán el 
         //4
         stage('Unit Tests') {
             steps {
-            echo '''(develop y master): Lanzamiento de test unitarios.
+            echo '''(develop y main): Lanzamiento de test unitarios.
 '''
             }
         }
         //5
         stage('JaCoCo Tests') {
             steps {
-            echo '''(develop y master): Lanzamiento de las pruebas con JaCoCo'
+            echo '''(develop y main): Lanzamiento de las pruebas con JaCoCo'
 '''
             }
         }
         //6
         stage('Quality Tests') {
             steps {
-            echo '''(develop y master): Comprobación de la calidad del código con Sonarqube.
+            echo '''(develop y main): Comprobación de la calidad del código con Sonarqube.
 '''
             }
         }
         //7
         stage('Package') {
             steps {
-            echo '''(develop y master): Generación del artefacto .jar (SNAPSHOT)
+            echo '''(develop y main): Generación del artefacto .jar (SNAPSHOT)
 '''
             }
         }
         //8
         stage('Build & Push') {
             steps {
-            echo '''(develop y master): Construcción de la imagen con Kaniko y subida de la misma a vuestro repositorio personal en Docker Hub.
+            echo '''(develop y main): Construcción de la imagen con Kaniko y subida de la misma a vuestro repositorio personal en Docker Hub.
 Ppara el etiquetado de la imagen se utilizará la versión del pom.xml
 '''
             }
@@ -95,31 +95,31 @@ Ppara el etiquetado de la imagen se utilizará la versión del pom.xml
         //9
         stage('Run test environment') {
             steps {
-            echo '''(develop y master): Iniciar un pod o contenedor con la imagen que acabamos de generar.
+            echo '''(develop y main): Iniciar un pod o contenedor con la imagen que acabamos de generar.
 '''
             }
         }
         //10
         stage('API Test o Performance TestPackage') {
             steps {
-            echo '''(develop y master): Lanzar los test de JMeter o las pruebas de API con Newman.
+            echo '''(develop y main): Lanzar los test de JMeter o las pruebas de API con Newman.
 '''
             }
         }
         //11
         stage('Nexus') {
             steps {
-            echo '''(develop y master): Si se ha llegado a esta etapa sin problemas:
-Se deberá depositar el artefacto generado (.jar) en Nexus.(develop y master)
+            echo '''(develop y main): Si se ha llegado a esta etapa sin problemas:
+Se deberá depositar el artefacto generado (.jar) en Nexus.(develop y main)
 Generación del artefacto .jar (SNAPSHOT)
 '''
             }
         }
         //12
         stage('Deploy') {
-            when { branch "master" }
+            when { branch "main" }
             steps {
-            echo '''(master): En esta stage se debe desplegar en un pod.
+            echo '''(main): En esta stage se debe desplegar en un pod.
 La imagen generada en la etapa 8.
 Para ello se deberá generar un Chart de Helm como los vistos en clase que contenga un ConfigMap y un Pod con dicha imagen (stage opcional)
 '''
