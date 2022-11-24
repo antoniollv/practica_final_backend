@@ -96,8 +96,8 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
         }
         //8
         stage('Build & Push') {
-            container('kaniko') {    
             steps {
+            container('kaniko') {
             echo '''08# Stage - Build & Push
 (develop y main): Construcción de la imagen con Kaniko y subida de la misma a vuestro repositorio personal en Docker Hub.
 Para el etiquetado de la imagen se utilizará la versión del pom.xml
