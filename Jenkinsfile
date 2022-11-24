@@ -33,8 +33,8 @@ spec:
         stage('Prepare environment') {
             steps {
                 echo "Running ${env.BUILD_ID} proyecto ${env.JOB_NAME} rama ${env.BRANCH_NAME}"
-                sh 'echo "Versión Java instalada en el agente: $(java -version)'
-                sh 'echo "Versión Maven instalada en el agente: $(mvn --version)'
+                sh 'echo "Versión Java instalada en el agente: $(java -version)"'
+                sh 'echo "Versión Maven instalada en el agente: $(mvn --version)"'
 
             }
         }
