@@ -16,7 +16,7 @@ kind: Pod
 spec:
   containers:
   - name: shell
-    image: ubuntu
+    image: jenkins/agent:latest-jdk11
     command:
     - sleep
     args:
