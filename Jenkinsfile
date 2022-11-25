@@ -117,7 +117,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
 '''
                 container('imgkaniko') {
                     sh '/kaniko/executor --dockerfile $(pwd)/Dockerfile --context $(pwd) \
-                    --destinatión=alledodev/app-pf-backend:1.0'
+                    --destination=alledodev/app-pf-backend:1.0'
                 }
             }
         }
