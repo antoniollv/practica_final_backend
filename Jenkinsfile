@@ -139,7 +139,6 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
 '''
                 if(fileExists("configuracion")){
                     sh 'rm -r configuracion'
-                  }
                 }
                 sshagent (credentials: ['credencialGITHUB']) {
 				    sh 'git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main'
