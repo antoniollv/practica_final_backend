@@ -2,14 +2,6 @@
 pipeline {
     agent {
         kubernetes {
-            // Rather than inline YAML, in a multibranch Pipeline you could use: yamlFile 'jenkins-pod.yaml'
-            // Or, to avoid YAML:
-            // containerTemplate {
-            //     name 'shell'
-            //     image 'ubuntu'
-            //     command 'sleep'
-            //     args 'infinity'
-            // }
             yaml '''
 apiVersion: v1
 kind: Pod
@@ -37,10 +29,6 @@ spec:
       secretName: kaniko-secret
       optional: false
 '''*/
-            // Can also wrap individual steps:
-            // container('shell') {
-            //     sh 'hostname'
-            // }
             defaultContainer 'shell'
         }
     }
@@ -73,15 +61,17 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             steps {
                 echo '''03# Stage - Compile
 '''
-                sh 'mvn clean compile'
+                sh 'mvn clean compile -DskipTests'
             }
         }
         //4
         stage('Unit Tests') {            
             steps {
             echo '''04# Stage - Unit Tests
-(develop y main): Lanzamiento de test unitarios.
+(develop y main): Lanzamiento de test unitarios.                
 '''
+                sh "mvn test"
+                junit "target/surefire-reports/*.xml"		
             }
         }
         //5
@@ -90,6 +80,8 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             echo '''05# Stage - JaCoCo Tests
 (develop y main): Lanzamiento de las pruebas con JaCoCo'
 '''
+				jacoco()
+                step( [ $class: 'JacocoPublisher' ] )
             }
         }
         //6
@@ -106,7 +98,7 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             echo '''07# Stage - Package
 (develop y main): Generación del artefacto .jar (SNAPSHOT)
 '''
-                sh 'mvn package'
+                sh 'mvn package -DskipTests'
             }
         }
         //8
@@ -132,7 +124,8 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
                                 ${command}
                                 set -x
                                 """)
-                            sh "/kaniko/executor --dockerfile Dockerfile --context ./ --destination ${idCredencialesDockerHub_USER}/${APP_IMAGE_NAME}:${APP_IMAGE_TAG} --cleanup"
+                            sh "/kaniko/executor --dockerfile Dockerfile --context ./ --destination ${idCredencialesDockerHub_USER}/${APP_IMAGE_NAME}:${APP_IMAGE_TAG}"
+                            sh "/kaniko/executor --dockerfile Dockerfile --context ./ --destination ${idCredencialesDockerHub_USER}/${APP_IMAGE_NAME}:latest --cleanup"
                         }
                     }
                 }
