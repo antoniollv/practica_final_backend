@@ -21,7 +21,7 @@ spec:
     - sleep
     args:
     - infinity
-  - name: builder
+  - name: imgkaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
     command:
@@ -115,7 +115,7 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
 (develop y main): Construcción de la imagen con Kaniko y subida de la misma a vuestro repositorio personal en Docker Hub.
 Para el etiquetado de la imagen se utilizará la versión del pom.xml
 '''
-                container('kaniko') {
+                container('imgkaniko') {
                     sh '/kaniko/executor --dockerfile $(pwd)/Dockerfile --context $(pwd) \
                     --destinatión=alledodev/app-pf-backend:1.0'
                 }
