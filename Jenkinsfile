@@ -121,7 +121,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
                     --destination=alledodev/app-pf-backend:1.0'
                 }*/
                     script {
-                        def APP_IMAGE_NAME = "alledodev/app-pf-backend"
+                        def APP_IMAGE_NAME = "app-pf-backend"
                         def APP_IMAGE_TAG = "1.0" //Aqui hay que obtenerlo de POM.txt
                         
                         withCredentials([usernamePassword(credentialsId: 'idCredencialesDockerHub', passwordVariable: 'idCredencialesDockerHub_PASS', usernameVariable: 'idCredencialesDockerHub_USER')]) {
@@ -132,7 +132,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
                                 ${command}
                                 set -x
                                 """)
-                            sh "/kaniko/executor --dockerfile Dockerfile --context ./ --destination ${DOCKER_HUB_USER}/${APP_IMAGE_NAME}:${APP_IMAGE_TAG} --cleanup"
+                            sh "/kaniko/executor --dockerfile Dockerfile --context ./ --destination ${idCredencialesDockerHub_USER}/${APP_IMAGE_NAME}:${APP_IMAGE_TAG} --cleanup"
                         }
                     }
                 }
