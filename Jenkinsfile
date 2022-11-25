@@ -27,7 +27,8 @@ spec:
     command:
     - /busybox/cat
     tty: true
-    volumeMounts:
+'''
+/*    volumeMounts:
       - name: kaniko-secret
         mountPath: /kaniko/.docker
   volumes:
@@ -35,7 +36,7 @@ spec:
     secret:
       secretName: kaniko-secret
       optional: false
-'''
+'''*/
             // Can also wrap individual steps:
             // container('shell') {
             //     sh 'hostname'
@@ -116,8 +117,24 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
 Para el etiquetado de la imagen se utilizará la versión del pom.xml
 '''
                 container('imgkaniko') {
-                    sh '/kaniko/executor --dockerfile $(pwd)/Dockerfile --context $(pwd) \
+                    /*sh '/kaniko/executor --dockerfile $(pwd)/Dockerfile --context $(pwd) \
                     --destination=alledodev/app-pf-backend:1.0'
+                }*/
+                    script {
+                        def APP_IMAGE_NAME = "alledodev/app-pf-backend"
+                        def APP_IMAGE_TAG = "1.0" //Aqui hay que obtenerlo de POM.txt
+                        
+                        withCredentials([usernamePassword(credentialsId: 'idCredencialesDockerHub', passwordVariable: 'idCredencialesDockerHub_PASS', usernameVariable: 'idCredencialesDockerHub_USER')]) {
+                            AUTH = sh(script: """echo -n "${idCredencialesDockerHub_USER}:${idCredencialesDockerHub_PASS}" | base64""", returnStdout: true).trim()
+                            command = """echo '{"auths": {"https://index.docker.io/v1/": {"auth": "${AUTH}"}}}' >> /kaniko/.docker/config.json"""
+                            sh("""
+                                set +x
+                                ${command}
+                                set -x
+                                """)
+                            sh "/kaniko/executor --dockerfile Dockerfile --context $(pwd) --destination ${DOCKER_HUB_USER}/${APP_IMAGE_NAME}:${APP_IMAGE_TAG} --cleanup"
+                        }
+                    }
                 }
             }
         }
