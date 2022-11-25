@@ -132,7 +132,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
                                 ${command}
                                 set -x
                                 """)
-                            sh "/kaniko/executor --dockerfile Dockerfile --context $(pwd) --destination ${DOCKER_HUB_USER}/${APP_IMAGE_NAME}:${APP_IMAGE_TAG} --cleanup"
+                            sh "/kaniko/executor --dockerfile Dockerfile --context ./ --destination ${DOCKER_HUB_USER}/${APP_IMAGE_NAME}:${APP_IMAGE_TAG} --cleanup"
                         }
                     }
                 }
