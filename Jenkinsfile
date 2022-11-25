@@ -143,8 +143,12 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
                     }
                 }
                 sshagent (credentials: ['credencialGITHUB']) {
-				    sh 'git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main'
-				    sh 'kubectl apply -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yml -n default --kubeconfig=configuracion/kubernetes-deployment/minikube/config'
+                    sh '''
+                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                    ssh-keyscan -t rsa,dsa github.com >> ~/.ssh/known_hosts
+				    git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
+				    kubectl apply -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yml -n default --kubeconfig=configuracion/kubernetes-deployment/minikube/config
+                    '''
                 }
             }
         }
