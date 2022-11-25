@@ -76,10 +76,7 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             }
         }
         //4
-        stage('Unit Tests') {
-            agent { 
-                label 'default'
-            }
+        stage('Unit Tests') {            
             steps {
             echo '''04# Stage - Unit Tests
 (develop y main): Lanzamiento de test unitarios.
