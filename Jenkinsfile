@@ -137,8 +137,10 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
             echo '''09# Stage - Run test environment
 (develop y main): Iniciar un pod o contenedor con la imagen que acabamos de generar.
 '''
-                if(fileExists("configuracion")){
-                    sh 'rm -r configuracion'
+                script {
+                    if(fileExists("configuracion")){
+                        sh 'rm -r configuracion'
+                    }
                 }
                 sshagent (credentials: ['credencialGITHUB']) {
 				    sh 'git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main'
