@@ -32,6 +32,13 @@ spec:
             defaultContainer 'shell'
         }
     }
+    parameters {
+    choice(
+      description: 'Ubicación, para saber en que Minikube se debe desplegar',
+      name: 'ubicacion',
+      choices: ['ofi', 'casa']
+    )
+    }
     stages {
         //1
         stage('Prepare environment') {
@@ -65,13 +72,13 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             }
         }
         //4
-        stage('Unit Tests') {            
+        stage('Unit Tests') {
             steps {
             echo '''04# Stage - Unit Tests
-(develop y main): Lanzamiento de test unitarios.                
+(develop y main): Lanzamiento de test unitarios.
 '''
                 sh "mvn test"
-                junit "target/surefire-reports/*.xml"		
+                junit "target/surefire-reports/*.xml"
             }
         }
         //5
@@ -80,7 +87,7 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             echo '''05# Stage - JaCoCo Tests
 (develop y main): Lanzamiento de las pruebas con JaCoCo'
 '''
-				jacoco()
+                jacoco()
                 step( [ $class: 'JacocoPublisher' ] )
             }
         }
@@ -105,7 +112,7 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
         stage('Build & Push') {
             steps {
             echo '''08# Stage - Build & Push
-(develop y main): Construcción de la imagen con Kaniko y subida de la misma a vuestro repositorio personal en Docker Hub.
+(develop y main): Construcción de la imagen con Kaniko y subida de la misma a repositorio personal en Docker Hub.
 Para el etiquetado de la imagen se utilizará la versión del pom.xml
 '''
                 container('imgkaniko') {
@@ -115,7 +122,6 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
                     script {
                         def APP_IMAGE_NAME = "app-pf-backend"
                         def APP_IMAGE_TAG = "1.0" //Aqui hay que obtenerlo de POM.txt
-                        
                         withCredentials([usernamePassword(credentialsId: 'idCredencialesDockerHub', passwordVariable: 'idCredencialesDockerHub_PASS', usernameVariable: 'idCredencialesDockerHub_USER')]) {
                             AUTH = sh(script: """echo -n "${idCredencialesDockerHub_USER}:${idCredencialesDockerHub_PASS}" | base64""", returnStdout: true).trim()
                             command = """echo '{"auths": {"https://index.docker.io/v1/": {"auth": "${AUTH}"}}}' >> /kaniko/.docker/config.json"""
@@ -138,17 +144,28 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
 (develop y main): Iniciar un pod o contenedor con la imagen que acabamos de generar.
 '''
                 script {
-                    if(fileExists("configuracion")){
+                    if(fileExists('configuracion')){
                         sh 'rm -r configuracion'
                     }
                 }
                 sshagent (credentials: ['credencialGITHUB']) {
-                    sh '''
+                    script {
+                        if (params.ubicacion == 'casa') {
+                        sh '''
                     [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
                     ssh-keyscan -t rsa,dsa github.com >> ~/.ssh/known_hosts
-				    git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
-				    kubectl apply -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yml -n default --kubeconfig=configuracion/kubernetes-deployment/minikube/config
+                    git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
+                    kubectl apply -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yml -n default --kubeconfig=configuracion/kubernetes-deployment/minikube/casa/config
                     '''
+                        } else {
+                        sh '''
+                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                    ssh-keyscan -t rsa,dsa github.com >> ~/.ssh/known_hosts
+                    git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
+                    kubectl apply -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yml -n default --kubeconfig=configuracion/kubernetes-deployment/minikube/config
+                    '''
+                        }
+                    }
                 }
             }
         }
