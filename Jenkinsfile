@@ -36,7 +36,6 @@ spec:
     choice(
       description: 'Ubicación, para saber en que Minikube se debe desplegar',
       name: 'ubicacion',
-      defaultValue: 'casa',
       choices: ['ofi', 'casa']
     )
     }
