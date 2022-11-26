@@ -36,6 +36,7 @@ spec:
     choice(
       description: 'Ubicación, para saber en que Minikube se debe desplegar',
       name: 'ubicacion',
+      defaultValue: 'casa',
       choices: ['ofi', 'casa']
     )
     }
@@ -191,10 +192,10 @@ Generación del artefacto .jar (SNAPSHOT)
         stage('Deploy') {
             when { branch "main" }
             steps {
-            echo '''12# Stage - Deploy
+            echo '''12# Stage - Deploy  (Stage opcional)
 (main): En esta stage se debe desplegar en un pod.
 La imagen generada en la etapa 8.
-Para ello se deberá generar un Chart de Helm como los vistos en clase que contenga un ConfigMap y un Pod con dicha imagen (stage opcional)
+Para ello se deberá generar un Chart de Helm que contenga un ConfigMap y un Pod con dicha imagen
 '''
             }
         }
@@ -203,7 +204,7 @@ Para ello se deberá generar un Chart de Helm como los vistos en clase que conte
     post { 
         always {            
             echo '''No es una stage como tal sino un bloque post:
-Que elimine siempre los recursos creados en la stage 8.
+Que elimine siempre los recursos creados en la Stage 8.
 '''
         }
     }
