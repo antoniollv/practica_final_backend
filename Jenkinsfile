@@ -17,6 +17,8 @@ spec:
     image: alledodev/jenkins-nodo-nodejs-bootcamp:latest
     command:
     - sleep
+     args:
+    - infinity
   - name: imgkaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
