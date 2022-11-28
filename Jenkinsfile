@@ -51,9 +51,9 @@ spec:
             steps {
                 echo '''01# Stage - Prepare environment
 '''
-                echo "Running ${env.BUILD_ID} proyecto ${env.JOB_NAME} rama ${env.BRANCH_NAME}"
+             /*   echo "Running ${env.BUILD_ID} proyecto ${env.JOB_NAME} rama ${env.BRANCH_NAME}"
                 sh 'echo "Versión Java instalada en el agente: $(java -version)"'
-                sh 'echo "Versión Maven instalada en el agente: $(mvn --version)"'
+                sh 'echo "Versión Maven instalada en el agente: $(mvn --version)"' */
 
             }
         }
@@ -83,8 +83,8 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             echo '''04# Stage - Unit Tests
 (develop y main): Lanzamiento de test unitarios.
 '''
-                sh "mvn test"
-                junit "target/surefire-reports/*.xml"
+              /*  sh "mvn test"
+                junit "target/surefire-reports/*.xml" */
             }
         }
         //5
@@ -93,8 +93,8 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             echo '''05# Stage - JaCoCo Tests
 (develop y main): Lanzamiento de las pruebas con JaCoCo'
 '''
-                jacoco()
-                step( [ $class: 'JacocoPublisher' ] )
+             /*   jacoco()
+                step( [ $class: 'JacocoPublisher' ] ) */
             }
         }
         //6
@@ -121,10 +121,8 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
 (develop y main): Construcción de la imagen con Kaniko y subida de la misma a repositorio personal en Docker Hub.
 Para el etiquetado de la imagen se utilizará la versión del pom.xml
 '''
-                container('imgkaniko') {
-                    /*sh '/kaniko/executor --dockerfile $(pwd)/Dockerfile --context $(pwd) \
-                    --destination=alledodev/app-pf-backend:1.0'
-                }*/
+            /*    container('imgkaniko') {
+                   
                     script {
                         def APP_IMAGE_NAME = "app-pf-backend"
                         def APP_IMAGE_TAG = "1.0" //Aqui hay que obtenerlo de POM.txt
@@ -140,7 +138,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
                             sh "/kaniko/executor --dockerfile Dockerfile --context ./ --destination ${idCredencialesDockerHub_USER}/${APP_IMAGE_NAME}:latest --cleanup"
                         }
                     }
-                }
+                } */
             }
         }
         //9
@@ -149,7 +147,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
             echo '''09# Stage - Run test environment
 (develop y main): Iniciar un pod o contenedor con la imagen que acabamos de generar.
 '''
-                script {
+            /*    script {
                     if(fileExists('configuracion')){
                         sh 'rm -r configuracion'
                     }
@@ -172,7 +170,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
                     '''
                         }
                     }
-                }
+                } */
             }
         }
         //10
@@ -181,7 +179,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
             echo '''10# Stage - API Test o Performance TestPackage
 (develop y main): Lanzar los test de JMeter o las pruebas de API con Newman.
 '''
-                container('nodejs') {
+            /*    container('nodejs') {
                     sh '''error=$(newman run ./src/main/resources/bootcamp.postman_collection.json --reporters cli,junit --reporter-junit-export "newman/report.xml")
 if [ $? -eq 0 ]; then
    echo "Newman Test OK"
@@ -190,7 +188,7 @@ else
 fi
 '''                    
                     junit "newman/report.xml"
-                }
+                } */
             }
             post { 
                 failure { 
