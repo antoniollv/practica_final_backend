@@ -189,6 +189,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
             post { 
                 failure { 
                     echo "Problemas al pasar los Test con Newman."
+                    sh 'exit 0'
                 }
             }
         }
