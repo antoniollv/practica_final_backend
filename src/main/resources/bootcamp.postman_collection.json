@@ -64,17 +64,7 @@
 					"raw": "{\r\n    \"title\": \"api-test\",\r\n    \"description\": \"api-test\",\r\n    \"published\": true\r\n}"
 				},
 				"url": {
-					"raw": "https://099880aef81607.lhr.life/api/tutorials",
-					"protocol": "https",
-					"host": [
-						"099880aef81607",
-						"lhr",
-						"life"
-					],
-					"path": [
-						"api",
-						"tutorials"
-					]
+					"raw": "http://192.168.88.222:8080/api/tutorials"					
 				}
 			},
 			"response": []
