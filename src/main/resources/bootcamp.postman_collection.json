@@ -64,7 +64,17 @@
 					"raw": "{\r\n    \"title\": \"api-test\",\r\n    \"description\": \"api-test\",\r\n    \"published\": true\r\n}"
 				},
 				"url": {
-					"raw": "http://192.168.88.222:8080/api/tutorials"					
+					"raw": "http://192.168.88.222:8080/api/tutorials",
+					"protocol": "http",
+					"host": [
+						"192.168.88.222:8080",
+						"",
+						""
+					],
+					"path": [
+						"api",
+						"tutorials"
+					]
 				}
 			},
 			"response": []
