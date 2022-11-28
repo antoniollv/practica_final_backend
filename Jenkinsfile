@@ -7,12 +7,16 @@ apiVersion: v1
 kind: Pod
 spec:
   containers:
-  - name: shell
+  - name: jdk11
     image: alledodev/jenkins-nodo-java-bootcamp:latest
     command:
     - sleep
     args:
     - infinity
+  - name: nodejs
+    image: alledodev/jenkins-nodo-nodejs-bootcamp:latest
+    command:
+    - sleep
   - name: imgkaniko
     image: gcr.io/kaniko-project/executor:debug
     imagePullPolicy: Always
@@ -29,7 +33,7 @@ spec:
       secretName: kaniko-secret
       optional: false
 '''*/
-            defaultContainer 'shell'
+            defaultContainer 'jdk11'
         }
     }
     parameters {
@@ -175,6 +179,10 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
             echo '''10# Stage - API Test o Performance TestPackage
 (develop y main): Lanzar los test de JMeter o las pruebas de API con Newman.
 '''
+                container('nodejs') {
+                    sh 'newman run spring-boot-app/src/main/resources/bootcamp.postman_collection.json --reporters cli,junit --reporter-junit-export "newman/report.xml"'
+                    junit "newman/report.xml"
+                }
             }
         }
         //11
