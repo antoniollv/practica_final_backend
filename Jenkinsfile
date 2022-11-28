@@ -182,9 +182,9 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
 (develop y main): Lanzar los test de JMeter o las pruebas de API con Newman.
 '''
                 container('nodejs') {
-                    sh ''' error=$(newman run ./src/main/resources/bootcamp.postman_collection.json --reporters cli,junit --reporter-junit-export "newman/report.xml")
+                    sh '''error=$(newman run ./src/main/resources/bootcamp.postman_collection.json --reporters cli,junit --reporter-junit-export "newman/report.xml")
 if [ $? -eq 0 ]; then
-   echo "service $i started by script"
+   echo "Newman Test OK"
 else
    echo "Problemas al pasar los Test con Newman. Error: $error"
 fi
@@ -203,7 +203,7 @@ fi
             environment {
 		        NEXUS_VERSION = "nexus3"
                 NEXUS_PROTOCOL = "http"
-                NEXUS_URL = "172.17.0.6:8081"
+                NEXUS_URL = "10.98.185.23:8081"
                 NEXUS_REPOSITORY = "bootcamp"
                 NEXUS_CREDENTIAL_ID = "nexusidentity"
             }
