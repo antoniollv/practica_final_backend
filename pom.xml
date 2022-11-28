@@ -56,6 +56,17 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.hamcrest</groupId>
+					<artifactId>hamcrest-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
     </dependencies>
 
     <build>
@@ -69,8 +80,38 @@
                 <artifactId>sonar-maven-plugin</artifactId>
                 <version>3.9.1.2184</version>
             </plugin>
+            <plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.8</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
     </build>
-
+    <distributionManagement>
+		<repository>
+			<id>bootcamp</id>
+			<name>Bootcampt</name>
+			<url>http://nexus-ui:8081/repository/bootcamp</url>
+		</repository>
+		<snapshotRepository>
+			<id>bootcamp</id>
+			<name>Bootcampt</name>
+			<url>http://nexus-ui:8081/repository/bootcamp</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 </project>
