@@ -105,12 +105,12 @@
 		<repository>
 			<id>bootcamp</id>
 			<name>Bootcampt</name>
-			<url>http://nexus-ui:8081/repository/bootcamp</url>
+			<url>http://192.168.88.222:8081/repository/bootcamp</url>
 		</repository>
 		<snapshotRepository>
 			<id>bootcamp</id>
 			<name>Bootcampt</name>
-			<url>http://nexus-ui:8081/repository/bootcamp</url>
+			<url>http://192.168.88.222:8081/repository/bootcamp</url>
 		</snapshotRepository>
 	</distributionManagement>
 
