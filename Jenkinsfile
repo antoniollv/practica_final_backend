@@ -182,7 +182,11 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
 (develop y main): Lanzar los test de JMeter o las pruebas de API con Newman.
 '''
                 container('nodejs') {
-                    sh 'newman run ./src/main/resources/bootcamp.postman_collection.json --reporters cli,junit --reporter-junit-export "newman/report.xml"'
+                    try {
+                        sh 'newman run ./src/main/resources/bootcamp.postman_collection.json --reporters cli,junit --reporter-junit-export "newman/report.xml"'
+                    } catch (err) {
+                        echo "Problemas al pasar los Test."
+                    }
                     junit "newman/report.xml"
                 }
             }
