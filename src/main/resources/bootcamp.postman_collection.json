@@ -67,10 +67,11 @@
 					"raw": "http://192.168.88.222:8080/api/tutorials",
 					"protocol": "http",
 					"host": [
-						"192.168.88.222:8080",
+						"192.168.88.222",
 						"",
 						""
 					],
+					"port" : 8080, 
 					"path": [
 						"api",
 						"tutorials"
