@@ -104,7 +104,15 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             (develop y main): Comprobación de la calidad del código con Sonarqube.
 '''
                 withSonarQubeEnv(credentialsId: "sonarqube-credentials", installationName: "sonarqube-server"){
-                sh "mvn clean verify sonar:sonar -DskipTests"
+                    sh "mvn clean verify sonar:sonar -DskipTests"
+                    timeout(time: 10, unit: "MINUTES") {
+                        script {
+                            def qg = waitForQualityGate(webhookSecretId: 'sonarqube-credentials')
+                                if (qg.status != 'OK') {
+                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            }
+                        }
+                    }
                 }
             }
         }
