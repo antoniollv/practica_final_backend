@@ -59,7 +59,7 @@ spec:
         }
         //2
         stage('Code promotion') {
-            when { branch "main" }
+            //when { branch "main" }
             steps {
             echo '''02# Stage - Code promotion
 En esta etapa se debe comprobar que la versión indicada en el fichero pom.xml no contiene el sufijo -SNAPSHOT.
