@@ -98,22 +98,29 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             }
         }
         //6
-        stage('Quality Tests') {
+        stage('Quality Tests 1 de 2') {
+            steps {
+            echo '''06# Stage - Quality Tests
+            (develop y main): Comprobación de la calidad del código con Sonarqube.
+'''
+                withSonarQubeEnv(credentialsId: "sonarqube-credentials", installationName: "sonarqube-server"){
+                    sh "mvn verify sonar:sonar -DskipTests"
+                }
+            }
+        }
+        stage('Quality Tests 2 de 2') {
             steps {
             echo '''06# Stage - Quality Tests
             (develop y main): Comprobación de la calidad del código con Sonarqube.
 '''
                 timeout(time: 10, unit: "MINUTES") {
-                    withSonarQubeEnv(credentialsId: "sonarqube-credentials", installationName: "sonarqube-server"){
-                        sh "mvn verify sonar:sonar -DskipTests"
-                        script {
-                            def qg = waitForQualityGate(webhookSecretId: 'sonarqube-credentials')
-                            if (qg.status != 'OK') {
-                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            }
+                    script {
+                        def qg = waitForQualityGate(webhookSecretId: 'sonarqube-credentials')
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
                         }
                     }
-                }
+                }    
             }
         }
         //7
