@@ -45,6 +45,10 @@ spec:
       choices: ['ofi', 'casa']
     )
     }
+    environment {
+		        APP_VERSION = ""
+
+            }
     stages {
         //1
         stage('Prepare environment') {
@@ -53,13 +57,14 @@ spec:
 '''
                 echo "Running ${env.BUILD_ID} proyecto ${env.JOB_NAME} rama ${env.BRANCH_NAME}"
                 sh 'echo "Versión Java instalada en el agente: $(java -version)"'
-                sh 'echo "Versión Maven instalada en el agente: $(mvn --version)"' 
-
+                sh 'echo "Versión Maven instalada en el agente: $(mvn --version)"'
+                pom = readMavenPom(file: 'pom.xml')
+                APP_VERSION = pom.version
             }
         }
         //2
         stage('Code promotion') {
-            //when { branch "main" }
+            when { branch "main" }
             steps {
             echo '''02# Stage - Code promotion
 En esta etapa se debe comprobar que la versión indicada en el fichero pom.xml no contiene el sufijo -SNAPSHOT.
@@ -70,8 +75,12 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
                 script{
                     pom = readMavenPom(file: 'pom.xml')
                     def pom_version = pom.version
-                    echo "${pom_version.replace('-SNAPSHOT','')}"
-
+                    pom.version = pom_version.replace('-SNAPSHOT','')
+                    APP_VERSION = pom.version
+                    writeMavenPom file: pomFile, model: pom
+                    sh 'git add pom.xml'
+                    sh "git commit -m \"Update pom.xml file version:${pom.version}\""
+                    sh 'git push origin master'
                 }
             }
         }
@@ -89,8 +98,8 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             echo '''04# Stage - Unit Tests
 (develop y main): Lanzamiento de test unitarios.
 '''
-              /*  sh "mvn test"
-                junit "target/surefire-reports/*.xml" */
+                sh "mvn test"
+                junit "target/surefire-reports/*.xml"
             }
         }
         //5
@@ -99,8 +108,8 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             echo '''05# Stage - JaCoCo Tests
 (develop y main): Lanzamiento de las pruebas con JaCoCo'
 '''
-             /*   jacoco()
-                step( [ $class: 'JacocoPublisher' ] ) */
+                jacoco()
+                step( [ $class: 'JacocoPublisher' ] )
             }
         }
         //6
@@ -145,11 +154,11 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
 (develop y main): Construcción de la imagen con Kaniko y subida de la misma a repositorio personal en Docker Hub.
 Para el etiquetado de la imagen se utilizará la versión del pom.xml
 '''
-            /*    container('imgkaniko') {
+                container('imgkaniko') {
                    
                     script {
                         def APP_IMAGE_NAME = "app-pf-backend"
-                        def APP_IMAGE_TAG = "1.0" //Aqui hay que obtenerlo de POM.txt
+                        def APP_IMAGE_TAG = APP_VERSION //Aqui hay que obtenerlo de POM.txt
                         withCredentials([usernamePassword(credentialsId: 'idCredencialesDockerHub', passwordVariable: 'idCredencialesDockerHub_PASS', usernameVariable: 'idCredencialesDockerHub_USER')]) {
                             AUTH = sh(script: """echo -n "${idCredencialesDockerHub_USER}:${idCredencialesDockerHub_PASS}" | base64""", returnStdout: true).trim()
                             command = """echo '{"auths": {"https://index.docker.io/v1/": {"auth": "${AUTH}"}}}' >> /kaniko/.docker/config.json"""
@@ -162,7 +171,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
                             sh "/kaniko/executor --dockerfile Dockerfile --context ./ --destination ${idCredencialesDockerHub_USER}/${APP_IMAGE_NAME}:latest --cleanup"
                         }
                     }
-                } */
+                } 
             }
         }
         //9
@@ -171,7 +180,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
             echo '''09# Stage - Run test environment
 (develop y main): Iniciar un pod o contenedor con la imagen que acabamos de generar.
 '''
-            /*    script {
+                script {
                     if(fileExists('configuracion')){
                         sh 'rm -r configuracion'
                     }
@@ -194,7 +203,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
                     '''
                         }
                     }
-                } */
+                } 
             }
         }
         //10
@@ -203,7 +212,7 @@ Para el etiquetado de la imagen se utilizará la versión del pom.xml
             echo '''10# Stage - API Test o Performance TestPackage
 (develop y main): Lanzar los test de JMeter o las pruebas de API con Newman.
 '''
-            /*    container('nodejs') {
+                container('nodejs') {
                     sh '''error=$(newman run ./src/main/resources/bootcamp.postman_collection.json --reporters cli,junit --reporter-junit-export "newman/report.xml")
 if [ $? -eq 0 ]; then
    echo "Newman Test OK"
@@ -212,7 +221,7 @@ else
 fi
 '''                    
                     junit "newman/report.xml"
-                } */
+                } 
             }
             post { 
                 failure { 
@@ -283,7 +292,32 @@ Generación del artefacto .jar (SNAPSHOT)
 (main): En esta stage se debe desplegar en un pod.
 La imagen generada en la etapa 8.
 Para ello se deberá generar un Chart de Helm que contenga un ConfigMap y un Pod con dicha imagen
-'''
+'''              
+                script {
+                    if(fileExists('configuracion')){
+                        sh 'rm -r configuracion'
+                    }
+                }
+                sshagent (credentials: ['credencialGITHUB']) {
+                    script {
+                        if (params.ubicacion == 'casa') {
+                        sh '''
+                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                    ssh-keyscan -t rsa,dsa github.com >> ~/.ssh/known_hosts
+                    git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
+                    kubectl apply -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yaml -n producion --kubeconfig=configuracion/kubernetes-deployment/minikube/casa/config
+                    '''
+                        } else {
+                        sh '''
+                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                    ssh-keyscan -t rsa,dsa github.com >> ~/.ssh/known_hosts
+                    git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
+                    kubectl apply -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yaml -n produccion --kubeconfig=configuracion/kubernetes-deployment/minikube/config
+                    '''
+                        }
+                    }
+                }             
+                
             }
         }
     }
@@ -293,6 +327,30 @@ Para ello se deberá generar un Chart de Helm que contenga un ConfigMap y un Pod
             echo '''No es una stage como tal sino un bloque post:
 Que elimine siempre los recursos creados en la Stage 8.
 '''
+                            script {
+                    if(fileExists('configuracion')){
+                        sh 'rm -r configuracion'
+                    }
+                }
+                sshagent (credentials: ['credencialGITHUB']) {
+                    script {
+                        if (params.ubicacion == 'casa') {
+                        sh '''
+                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                    ssh-keyscan -t rsa,dsa github.com >> ~/.ssh/known_hosts
+                    git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
+                    kubectl delete -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yaml -n default --kubeconfig=configuracion/kubernetes-deployment/minikube/casa/config
+                    '''
+                        } else {
+                        sh '''
+                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
+                    ssh-keyscan -t rsa,dsa github.com >> ~/.ssh/known_hosts
+                    git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
+                    kubectl delete -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yaml -n default --kubeconfig=configuracion/kubernetes-deployment/minikube/config
+                    '''
+                        }
+                    }
+                }
         }
     }
 }
