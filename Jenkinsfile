@@ -70,7 +70,8 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
                 script{
                     pom = readMavenPom(file: 'pom.xml')
                     def pom_version = pom.version
-                    echo "${pom_version}"
+                    echo "${pom_version.repalce('-SNAPSHOT',''}"
+
                 }
             }
         }
