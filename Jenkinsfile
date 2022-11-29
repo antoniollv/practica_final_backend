@@ -75,14 +75,14 @@ Una vez hecho esto, se debe hacer commit del cambio y push a la rama main.
 De esta forma, todos los artefactos generados en la rama main, no tendrán el sufijo SNAPSHOT.
 '''
                 script{
-                    pom = readMavenPom(file: 'pom.xml')
-                    def pom_version = pom.version
+                    def pom = readMavenPom(file: 'pom.xml')
+                    pom_version = pom.version
                     pom.version = pom_version.replace('-SNAPSHOT','')
                     APP_VERSION = pom.version
-                    writeMavenPom file: pomFile, model: pom
-                    sh 'git add pom.xml'
-                    sh "git commit -m \"Update pom.xml file version:${pom.version}\""
-                    sh 'git push origin master'
+                    writeMavenPom (file: 'pom.xml')
+                    //sh 'git add pom.xml'
+                    //sh "git commit -m \"Update pom.xml file version:${pom.version}\""
+                    //sh 'git push origin master'
                 }
             }
         }
