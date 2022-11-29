@@ -51,9 +51,9 @@ spec:
             steps {
                 echo '''01# Stage - Prepare environment
 '''
-             /*   echo "Running ${env.BUILD_ID} proyecto ${env.JOB_NAME} rama ${env.BRANCH_NAME}"
+                echo "Running ${env.BUILD_ID} proyecto ${env.JOB_NAME} rama ${env.BRANCH_NAME}"
                 sh 'echo "Versión Java instalada en el agente: $(java -version)"'
-                sh 'echo "Versión Maven instalada en el agente: $(mvn --version)"' */
+                sh 'echo "Versión Maven instalada en el agente: $(mvn --version)"' 
 
             }
         }
@@ -67,6 +67,11 @@ De ser así, se debe modificar el fichero pom.xml, eliminando el sufijo.
 Una vez hecho esto, se debe hacer commit del cambio y push a la rama main.
 De esta forma, todos los artefactos generados en la rama main, no tendrán el sufijo SNAPSHOT.
 '''
+                script{
+                    pom = readMavenPom(file: 'pom.xml')
+                    def pom_version = pom.version
+                    echo "${pom_version}"
+                }
             }
         }
         //3
