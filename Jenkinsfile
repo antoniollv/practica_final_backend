@@ -81,6 +81,7 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
                     APP_VERSION = pom.version
                     echo "${ APP_VERSION }"
                     writeMavenPom model: pom
+                    sh 'cat pom.xml'
                     //sh 'git add pom.xml'
                     //sh "git commit -m \"Update pom.xml file version:${pom.version}\""
                     //sh 'git push origin master'
