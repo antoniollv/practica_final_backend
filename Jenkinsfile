@@ -66,7 +66,7 @@ spec:
         }
         //2
         stage('Code promotion') {
-            when { branch "main" }
+            //when { branch "main" }
             steps {
             echo '''02# Stage - Code promotion
 En esta etapa se debe comprobar que la versión indicada en el fichero pom.xml no contiene el sufijo -SNAPSHOT.
@@ -79,6 +79,7 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
                     pom_version = pom.version
                     pom.version = pom_version.replace('-SNAPSHOT','')
                     APP_VERSION = pom.version
+                    echo "${ APP_VERSION }"
                     writeMavenPom (file: 'pom.xml')
                     //sh 'git add pom.xml'
                     //sh "git commit -m \"Update pom.xml file version:${pom.version}\""
