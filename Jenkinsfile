@@ -105,6 +105,7 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
 '''
                 withSonarQubeEnv(credentialsId: "sonarqube-credentials", installationName: "sonarqube-server"){
                 sh "mvn clean verify sonar:sonar -DskipTests"
+                }
             }
         }
         //7
