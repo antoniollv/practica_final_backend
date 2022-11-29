@@ -304,15 +304,11 @@ Para ello se deberá generar un Chart de Helm que contenga un ConfigMap y un Pod
                     script {
                         if (params.ubicacion == 'casa') {
                         sh '''
-                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                    ssh-keyscan -t rsa,dsa github.com >> ~/.ssh/known_hosts
                     git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
                     kubectl apply -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yaml -n producion --kubeconfig=configuracion/kubernetes-deployment/minikube/casa/config
                     '''
                         } else {
                         sh '''
-                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                    ssh-keyscan -t rsa,dsa github.com >> ~/.ssh/known_hosts
                     git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
                     kubectl apply -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yaml -n produccion --kubeconfig=configuracion/kubernetes-deployment/minikube/config
                     '''
@@ -338,15 +334,11 @@ Que elimine siempre los recursos creados en la Stage 8.
                     script {
                         if (params.ubicacion == 'casa') {
                         sh '''
-                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                    ssh-keyscan -t rsa,dsa github.com >> ~/.ssh/known_hosts
                     git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
                     kubectl delete -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yaml -n default --kubeconfig=configuracion/kubernetes-deployment/minikube/casa/config
                     '''
                         } else {
                         sh '''
-                    [ -d ~/.ssh ] || mkdir ~/.ssh && chmod 0700 ~/.ssh
-                    ssh-keyscan -t rsa,dsa github.com >> ~/.ssh/known_hosts
                     git clone git@github.com:antoniollv/deploy-to-k8s-conf.git configuracion --branch main
                     kubectl delete -f configuracion/kubernetes-deployment/spring-boot-app/manifest.yaml -n default --kubeconfig=configuracion/kubernetes-deployment/minikube/config
                     '''
