@@ -58,8 +58,10 @@ spec:
                 echo "Running ${env.BUILD_ID} proyecto ${env.JOB_NAME} rama ${env.BRANCH_NAME}"
                 sh 'echo "Versión Java instalada en el agente: $(java -version)"'
                 sh 'echo "Versión Maven instalada en el agente: $(mvn --version)"'
-                pom = readMavenPom(file: 'pom.xml')
+                script {
+                def pom = readMavenPom(file: 'pom.xml')
                 APP_VERSION = pom.version
+                }
             }
         }
         //2
