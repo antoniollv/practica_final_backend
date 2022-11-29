@@ -201,7 +201,7 @@ fi
             environment {
 		        NEXUS_VERSION = "nexus3"
                 NEXUS_PROTOCOL = "http"
-                NEXUS_URL = "10.98.185.23:8081"
+                NEXUS_URL = "10.101.33.36:8081"
                 NEXUS_REPOSITORY = "bootcamp/"
                 NEXUS_CREDENTIAL_ID = "nexusidentity"
             }
