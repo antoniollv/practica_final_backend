@@ -80,10 +80,11 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
                     pom.version = pom_version.replace('-SNAPSHOT','')
                     APP_VERSION = pom.version
                     echo "${ APP_VERSION }"
-                    writeMavenPom (file: 'pom.xml')
+                    writeMavenPom model: pom
                     //sh 'git add pom.xml'
                     //sh "git commit -m \"Update pom.xml file version:${pom.version}\""
                     //sh 'git push origin master'
+                    sh 'exit 1'
                 }
             }
         }
