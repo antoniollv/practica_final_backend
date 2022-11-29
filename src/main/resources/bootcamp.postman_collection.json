@@ -18,7 +18,7 @@
 							"});\r",
 							"\r",
 							"pm.test(\"Response time is less than 1002ms\", function () {\r",
-							"    pm.expect(pm.response.responseTime).to.be.below(1002);\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1500);\r",
 							"});\r",
 							"\r",
 							"\r",
