@@ -27,9 +27,9 @@
             <properties>
                 <!-- Optional URL to server. Default value is http://localhost:9000 -->
                 <sonar.host.url>
-                    http://sonarqube:9000
+                    http://192.168.49.4:9000
                 </sonar.host.url>
-                <sonar.login>squ_aef171a93ea1b6dbea7ecac58bd1e2a559dec9ce</sonar.login>
+                <sonar.login>squ_b654bd03ae4ddbd43a45066c70eae38db222ed32</sonar.login>
             </properties>
         </profile>
     </profiles>

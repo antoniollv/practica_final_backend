@@ -103,6 +103,8 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             echo '''06# Stage - Quality Tests
             (develop y main): Comprobación de la calidad del código con Sonarqube.
 '''
+                withSonarQubeEnv(credentialsId: "sonarqube-credentials", installationName: "sonarqube-server"){
+                sh "mvn clean verify sonar:sonar -DskipTests"
             }
         }
         //7
