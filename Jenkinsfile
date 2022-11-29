@@ -103,12 +103,12 @@ De esta forma, todos los artefactos generados en la rama main, no tendrán el su
             echo '''06# Stage - Quality Tests
             (develop y main): Comprobación de la calidad del código con Sonarqube.
 '''
-                withSonarQubeEnv(credentialsId: "sonarqube-credentials", installationName: "sonarqube-server"){
-                    sh "mvn clean verify sonar:sonar -DskipTests"
-                    timeout(time: 10, unit: "MINUTES") {
+                timeout(time: 10, unit: "MINUTES") {
+                    withSonarQubeEnv(credentialsId: "sonarqube-credentials", installationName: "sonarqube-server"){
+                        sh "mvn verify sonar:sonar -DskipTests"
                         script {
                             def qg = waitForQualityGate(webhookSecretId: 'sonarqube-credentials')
-                                if (qg.status != 'OK') {
+                            if (qg.status != 'OK') {
                                 error "Pipeline aborted due to quality gate failure: ${qg.status}"
                             }
                         }
